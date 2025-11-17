@@ -1,123 +1,173 @@
+# Senai AutoHub -- Repositório de Materiais
 
-# Senai AutoHub
+Sistema web para armazenamento e gerenciamento de materiais educacionais
+do **SENAI**, estruturado com:
 
-Repositório de materiais (documentos e vídeos) para o SENAI, com três perfis:
+-   **FastAPI**
+-   **SQLAlchemy**
+-   **Jinja2 Templates**
 
-- **Admin**: gerencia usuários e materiais, executa backup.
-- **Professor**: cadastra materiais e, posteriormente, alunos.
-- **Aluno**: acessa, pesquisa e abre materiais disponíveis.
+Com três níveis de acesso:
 
-Projeto baseado em **FastAPI + SQLAlchemy + Jinja2**, preparado para evoluir para produção.
+-   **Admin** --- gerencia usuários, materiais e backup.
+-   **Professor** --- gerencia alunos e materiais.
+-   **Aluno** --- acessa e pesquisa materiais.
 
----
+------------------------------------------------------------------------
 
 ## 1. Requisitos
 
-- Python 3.10+
-- Pip / Virtualenv
+-   Python **3.10+**
+-   Pip + Virtualenv
 
-Instalação de dependências:
+Instalação das dependências:
 
-```bash
+``` bash
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
----
+------------------------------------------------------------------------
 
-## 2. Estrutura básica
+## 2. Inicialização do Banco + Admin Padrão
 
-- `app/` – código da aplicação (rotas, modelos, serviços).
-- `templates/` – HTML com Jinja2.
-- `static/` – CSS e JS.
-- `uploads/materials/` – arquivos enviados.
-- `backups/` – base para rotina de backup (scripts futuros).
+Antes de rodar o sistema:
 
----
-
-## 3. Inicialização do banco e admin padrão
-
-Antes de rodar a API, inicialize o banco e crie o admin padrão:
-
-```bash
+``` bash
 python -m app.db.init_db
 ```
 
-Isso cria o arquivo `senai_autohub.db` e o usuário admin (se não existir).
+Isso cria o banco (`senai_autohub.db`) e o **usuário admin inicial**
+caso ele não exista.
 
-### Admin padrão
+### Admin padrão (pode ser configurado via `.env`)
 
-> **IMPORTANTE: troque esses valores em produção (via `.env`).**
+-   **Email:** `admin@senai.autohub`
+-   **Senha:** `Admin123!`
 
-- E-mail: `admin@senai.autohub`
-- Senha: `Admin123!`
+Para customizar, crie um arquivo `.env` na raiz:
 
-Você pode sobrescrever em um arquivo `.env` na raiz do projeto:
-
-```env
-SECRET_KEY=chave-muito-segura-aqui
-CSRF_SECRET=outra-chave-bem-segura
+``` env
+SECRET_KEY=sua-chave-segura
+CSRF_SECRET=outra-chave-segura
 DATABASE_URL=sqlite:///./senai_autohub.db
 ADMIN_EMAIL=admin@senai.autohub
-ADMIN_PASSWORD=SuaSenhaForteAqui123!
+ADMIN_PASSWORD=SenhaForte123!
 ```
 
----
+------------------------------------------------------------------------
 
-## 4. Rodando o servidor
+## 3. Rodando o Servidor
 
 Após instalar dependências e inicializar o banco:
 
-```bash
+``` bash
 uvicorn app.main:app --reload
 ```
 
-Acesse em: http://127.0.0.1:8000
+Acesse:
 
-Rotas principais:
+    http://127.0.0.1:8000
 
-- `/` – lista de materiais com busca e filtro por tipo.
-- `/auth/login` – tela de login.
-- `/materials/dashboard` – dashboard do professor/admin.
-- `/materials/new` – cadastro de novo material.
-- `/admin/users` – listagem de usuários (somente admin).
+Documentação automática:
 
-Swagger/OpenAPI: http://127.0.0.1:8000/docs
+    http://127.0.0.1:8000/docs
 
----
+------------------------------------------------------------------------
 
-## 5. Fluxo de acesso
+## 4. Principais Rotas
 
-1. **Primeiro login**: somente o **admin padrão** consegue acessar (não existe mais ninguém no sistema).
-2. Admin autentica em `/auth/login`.
-3. Admin cria professores (futuras rotas/procedimentos – já há listagem em `/admin/users` para visualização).
-4. Professores logam e passam a cadastrar materiais e, futuramente, alunos (via convites/tokens).
+### Autenticação
 
-> Como não há rota pública de cadastro, **nenhum aluno ou professor** consegue se criar sozinho.  
-> Isso garante que **apenas o admin padrão** tem acesso inicial ao sistema.
+  Método   Rota             Descrição
+  -------- ---------------- -------------------
+  GET      `/auth/login`    Tela de login
+  POST     `/auth/login`    Autentica usuário
+  GET      `/auth/logout`   Logout
 
----
+------------------------------------------------------------------------
 
-## 6. Produção / Hardening
+### Materiais (Admin + Professor)
 
-Para uso real, recomenda-se:
+  Rota                       Descrição
+  -------------------------- ------------------------
+  `/materials/dashboard`     Dashboard de materiais
+  `/materials/new`           Criar material
+  `/materials/{id}/edit`     Editar
+  `/materials/{id}/delete`   Excluir
 
-- Usar banco PostgreSQL com URL em `DATABASE_URL`.
-- Servir via servidor ASGI robusto (ex.: uvicorn + nginx).
-- Ativar `secure=True` no cookie de sessão (já previsto em `core/security.py`).
-- Configurar domínios permitidos em CORS.
-- Implementar rotinas de:
-  - Backup agendado (`backups/`).
-  - Criação/edição de usuários via painel admin.
-  - Rate limiting para login.
+------------------------------------------------------------------------
 
----
+### Admin --- Usuários
 
-## 7. Próximos passos sugeridos
+  Rota                                Tipo       Descrição
+  ----------------------------------- ---------- ------------------
+  `/admin/users`                      GET        Listar usuários
+  `/admin/users/new`                  GET/POST   Criar usuário
+  `/admin/users/{id}/edit`            GET/POST   Editar usuário
+  `/admin/users/{id}/toggle-active`   POST       Ativar/desativar
 
-- Implementar fluxo completo de **convite de aluno** usando `InviteToken`.
-- Criar telas para o admin cadastrar/editar **professores** pelo front.
-- Implementar telas de visualização de materiais acessados pelos alunos (auditoria).
+------------------------------------------------------------------------
 
-Este projeto já está pronto para ser rodado em ambiente de homologação e adaptado para produção.
+### Admin --- Backup
+
+  Rota                  Tipo   Descrição
+  --------------------- ------ -----------------
+  `/admin/backup`       GET    Tela de backup
+  `/admin/backup/run`   POST   Executar backup
+
+------------------------------------------------------------------------
+
+### Professor/Admin --- Alunos
+
+  Rota                      Tipo       Descrição
+  ------------------------- ---------- -----------------
+  `/students/manage`        GET        Listar alunos
+  `/students/new`           GET/POST   Criar aluno
+  `/students/{id}/edit`     GET/POST   Editar aluno
+  `/students/{id}/delete`   POST       Desativar aluno
+
+------------------------------------------------------------------------
+
+### Público --- Alunos
+
+  Rota               Descrição
+  ------------------ --------------------
+  `/`                Lista de materiais
+  `/material/{id}`   Abrir material
+
+------------------------------------------------------------------------
+
+## 5. Estrutura Básica
+
+    senai_autohub/
+    │
+    ├── app/
+    │   ├── main.py
+    │   ├── models/
+    │   ├── routes/
+    │   ├── services/
+    │   ├── core/
+    │   └── db/
+    │
+    ├── templates/
+    ├── static/
+    ├── uploads/materials/
+    ├── backups/
+    │
+    ├── requirements.txt
+    └── README.md
+
+------------------------------------------------------------------------
+
+## 6. Resumo do Processo de Execução
+
+1.  Criar ambiente virtual\
+2.  Instalar dependências\
+3.  Iniciar banco e admin padrão\
+4.  Rodar servidor FastAPI\
+5.  Logar com admin, configurar usuários e usar o sistema
+
+Pronto para uso em ambiente local, podendo ser adaptado facilmente para
+produção.
