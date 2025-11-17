@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if user %}Editar Usuário{% else %}Novo Usuário{% endif %} - Senai AutoHub
+{% endblock %}
+
+{% block content %}
+<section class="form-card">
+    <h1>{% if user %}Editar usuário{% else %}Novo usuário{% endif %}</h1>
+    <form method="post"
+          action="{% if user %}/admin/users/{{ user.id }}/edit{% else %}/admin/users/new{% endif %}"
+          class="form">
+        <label class="form__field">
+            <span>Nome</span>
+            <input type="text" name="name" value="{{ (user.name if user else (user.name if user and user.name else '') ) if false else (user.name if user else (user.name if user else (user.name if user else ''))) }}">
+        </label>
+
+        <label class="form__field">
+            <span>Nome</span>
+            <input type="text" name="name" value="{% if user %}{{ user.name }}{% elif user and user.name %}{{ user.name }}{% else %}{{ user.name if user else '' }}{% endif %}" required>
+        </label>
+
+        <label class="form__field">
+            <span>E-mail</span>
+            <input type="email" name="email" value="{% if user %}{{ user.email }}{% elif user and user.email %}{{ user.email }}{% else %}{{ user.email if user else '' }}{% endif %}" required>
+        </label>
+
+        <label class="form__field">
+            <span>Senha {% if user %}(deixe em branco para manter){% endif %}</span>
+            <input type="password" name="password" {% if not user %}required{% endif %}>
+        </label>
+
+        <label class="form__field">
+            <span>Papel</span>
+            <select name="role" required>
+                <option value="ADMIN"
+                    {% if user and user.role.value == "ADMIN" %}selected{% endif %}>
+                    Admin
+                </option>
+                <option value="PROFESSOR"
+                    {% if user and user.role.value == "PROFESSOR" %}selected{% endif %}>
+                    Professor
+                </option>
+                <option value="STUDENT"
+                    {% if user and user.role.value == "STUDENT" %}selected{% endif %}>
+                    Aluno
+                </option>
+            </select>
+        </label>
+
+        {% if error %}
+            <p class="form__error">{{ error }}</p>
+        {% endif %}
+
+        <button type="submit" class="btn btn--primary">
+            {% if user %}Atualizar{% else %}Salvar{% endif %}
+        </button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,58 @@
+
+{% extends "base.html" %}
+
+{% block title %}Materiais - Senai AutoHub{% endblock %}
+
+{% block content %}
+<section class="search-panel">
+    <form method="get" action="/" class="search-panel__form">
+        <input
+            type="text"
+            name="q"
+            value="{{ q }}"
+            placeholder="Buscar por título ou descrição..."
+            class="search-panel__input"
+        >
+
+        <label class="search-panel__checkbox">
+            <input type="checkbox" name="types" value="DOCUMENT"
+                   {% if "DOCUMENT" in types %}checked{% endif %}>
+            Documentos
+        </label>
+
+        <label class="search-panel__checkbox">
+            <input type="checkbox" name="types" value="VIDEO"
+                   {% if "VIDEO" in types %}checked{% endif %}>
+            Vídeos
+        </label>
+
+        <button type="submit" class="btn btn--primary">Filtrar</button>
+    </form>
+</section>
+
+<section class="cards-grid">
+    {% if materials %}
+        {% for m in materials %}
+            <article class="card card--material">
+                <header class="card__header">
+                    <span class="badge badge--{{ m.type | lower }}">{{ m.type }}</span>
+                    <h2 class="card__title">{{ m.title }}</h2>
+                </header>
+                <p class="card__description">
+                    {{ m.description[:160] }}{% if m.description|length > 160 %}...{% endif %}
+                </p>
+                <footer class="card__footer">
+                    <a href="/materials/{{ m.id }}/open" class="btn btn--secondary">
+                        Abrir
+                    </a>
+                    <span class="card__meta">
+                        por {{ m.author_name }} • {{ m.created_at.strftime("%d/%m/%Y") }}
+                    </span>
+                </footer>
+            </article>
+        {% endfor %}
+    {% else %}
+        <p>Nenhum material encontrado.</p>
+    {% endif %}
+</section>
+{% endblock %}

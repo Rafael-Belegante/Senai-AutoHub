@@ -1,0 +1,41 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Senai AutoHub{% endblock %}
+
+{% block content %}
+<section class="dashboard-header">
+    <h1>Dashboard</h1>
+    <a href="/materials/new" class="btn btn--primary">Novo material</a>
+</section>
+
+<section class="cards-grid">
+    {% if materials %}
+        {% for m in materials %}
+            <article class="card card--material">
+                <header class="card__header">
+                    <span class="badge badge--{{ m.type.value | lower }}">{{ m.type.value }}</span>
+                    <h2 class="card__title">{{ m.title }}</h2>
+                </header>
+                <p class="card__description">
+                    {{ m.description[:160] }}{% if m.description|length > 160 %}...{% endif %}
+                </p>
+                <footer class="card__footer">
+                    <div>
+                        <a href="/materials/{{ m.id }}/open" class="btn btn--secondary" target="_blank" rel="noopener noreferrer">Abrir</a>
+                        <a href="/materials/{{ m.id }}/edit" class="btn btn--secondary">Editar</a>
+                        <form method="post" action="/materials/{{ m.id }}/delete" style="display:inline;">
+                            <button type="submit" class="btn btn--secondary">Excluir</button>
+                        </form>
+                    </div>
+                    <span class="card__meta">
+                        Criado em {{ m.created_at.strftime("%d/%m/%Y") }}
+                    </span>
+                </footer>
+            </article>
+        {% endfor %}
+    {% else %}
+        <p>Nenhum material cadastrado ainda.</p>
+    {% endif %}
+</section>
+{% endblock %}

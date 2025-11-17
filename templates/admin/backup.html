@@ -1,0 +1,40 @@
+
+{% extends "base.html" %}
+
+{% block title %}Backup - Senai AutoHub{% endblock %}
+
+{% block content %}
+<section class="form-card">
+    <h1>Configuração de backup</h1>
+
+    {% if message %}
+        <p class="form__error" style="color: green;">{{ message }}</p>
+    {% endif %}
+
+    <form method="post" action="/admin/backup" class="form">
+        <label class="form__field">
+            <span>Ativar backup automático</span>
+            <input type="checkbox" name="enabled" value="1"
+                   {% if config.enabled %}checked{% endif %}>
+        </label>
+
+        <label class="form__field">
+            <span>Intervalo (em horas)</span>
+            <input type="number" name="interval_hours" min="1" value="{{ config.interval_hours }}">
+        </label>
+
+        <label class="form__field">
+            <span>Última execução</span>
+            <input type="text" value="{% if config.last_run_at %}{{ config.last_run_at }}{% else %}Nunca{% endif %}"
+                   readonly>
+        </label>
+
+        <label class="form__field">
+            <span>Executar agora</span>
+            <input type="checkbox" name="run_now" value="1">
+        </label>
+
+        <button type="submit" class="btn btn--primary">Salvar</button>
+    </form>
+</section>
+{% endblock %}

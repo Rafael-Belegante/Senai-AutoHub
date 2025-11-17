@@ -1,0 +1,31 @@
+
+{% extends "base.html" %}
+
+{% block title %}Login - Senai AutoHub{% endblock %}
+
+{% block content %}
+<section class="auth-card">
+    <h1 class="auth-card__title">Entrar</h1>
+    <form method="post" action="/auth/login" class="auth-card__form">
+        <label class="form__field">
+            <span>E-mail</span>
+            <input type="email" name="email" required>
+        </label>
+
+        <label class="form__field">
+            <span>Senha</span>
+            <input type="password" name="password" required>
+        </label>
+
+        {% if error %}
+            <p class="form__error">{{ error }}</p>
+        {% endif %}
+
+        <button type="submit" class="btn btn--primary btn--block">Entrar</button>
+    </form>
+
+    <p class="auth-card__hint">
+        Primeiro acesso: use o admin padrão documentado no README.
+    </p>
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Alunos - Senai AutoHub{% endblock %}
+
+{% block content %}
+<section class="admin-list">
+    <div class="dashboard-header">
+        <h1>Alunos</h1>
+        <a href="/students/new" class="btn btn--primary">Novo aluno</a>
+    </div>
+
+    <div class="table-wrapper">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Ativo</th>
+                <th>Criado em</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.email }}</td>
+                    <td>{{ "Sim" if s.is_active else "Não" }}</td>
+                    <td>{{ s.created_at.strftime("%d/%m/%Y") }}</td>
+                    <td>
+                        <a href="/students/{{ s.id }}/edit" class="btn btn--secondary">Editar</a>
+                        <form method="post" action="/students/{{ s.id }}/delete" style="display:inline;">
+                            <button type="submit" class="btn btn--secondary">
+                                {% if s.is_active %}Desativar{% else %}Reativar{% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</section>
+{% endblock %}

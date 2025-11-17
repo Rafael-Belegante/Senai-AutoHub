@@ -1,0 +1,100 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+    {% if material %}Editar Material{% else %}Novo Material{% endif %} - Senai AutoHub
+{% endblock %}
+
+{% block content %}
+<section class="form-card">
+    <h1>{% if material %}Editar material{% else %}Novo material{% endif %}</h1>
+
+    <form method="post"
+          action="{% if material %}/materials/{{ material.id }}/edit{% else %}/materials/new{% endif %}"
+          enctype="multipart/form-data"
+          class="form">
+
+        <label class="form__field">
+            <span>Título</span>
+            <input type="text" name="title" value="{{ material.title if material else '' }}" required>
+        </label>
+
+        <label class="form__field">
+            <span>Descrição</span>
+            <textarea name="description" rows="3">{{ material.description if material else '' }}</textarea>
+        </label>
+
+        <label class="form__field">
+            <span>Tipo</span>
+            <select name="type" required>
+                <option value="DOCUMENT"
+                    {% if material and material.type.value == "DOCUMENT" %}selected{% endif %}>
+                    Documento
+                </option>
+                <option value="VIDEO"
+                    {% if material and material.type.value == "VIDEO" %}selected{% endif %}>
+                    Vídeo
+                </option>
+            </select>
+        </label>
+
+        <label class="form__field">
+            <span>Origem</span>
+            <select name="source_type" required id="source_type">
+                <option value="UPLOAD"
+                    {% if not material or material.source_type.value == "UPLOAD" %}selected{% endif %}>
+                    Upload de arquivo
+                </option>
+                <option value="URL"
+                    {% if material and material.source_type.value == "URL" %}selected{% endif %}>
+                    Link externo
+                </option>
+            </select>
+        </label>
+
+        <div class="form__field" id="field_upload">
+            <span>Arquivo</span>
+            <input type="file" name="file">
+            {% if material and material.file_path %}
+                <small>Arquivo atual: {{ material.file_path }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form__field" id="field_url" style="display:none;">
+            <span>URL</span>
+            <input type="url" name="external_url"
+                   value="{% if material and material.external_url %}{{ material.external_url }}{% endif %}"
+                   placeholder="https://...">
+        </div>
+
+        {% if error %}
+            <p class="form__error">{{ error }}</p>
+        {% endif %}
+
+        <button type="submit" class="btn btn--primary">
+            {% if material %}Atualizar{% else %}Salvar{% endif %}
+        </button>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const sourceSelect = document.getElementById("source_type");
+    const fieldUpload = document.getElementById("field_upload");
+    const fieldUrl = document.getElementById("field_url");
+
+    function updateSourceFields() {
+        if (sourceSelect.value === "UPLOAD") {
+            fieldUpload.style.display = "block";
+            fieldUrl.style.display = "none";
+        } else {
+            fieldUpload.style.display = "none";
+            fieldUrl.style.display = "block";
+        }
+    }
+
+    sourceSelect.addEventListener("change", updateSourceFields);
+    updateSourceFields();
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Senai AutoHub{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+</head>
+<body>
+<header class="topbar">
+    <div class="topbar__brand">
+        <div class="topbar__logo-placeholder">SENAI</div>
+        <span class="topbar__title">Senai AutoHub</span>
+    </div>
+    <nav class="topbar__nav">
+    <a href="/" class="topbar__link">Materiais</a>
+    {% if request.state.user %}
+        <a href="/materials/dashboard" class="topbar__link">Dashboard</a>
+        {% if request.state.user.role.value in ["ADMIN", "PROFESSOR"] %}
+            <a href="/students/manage" class="topbar__link">Alunos</a>
+        {% endif %}
+        {% if request.state.user.role.value == "ADMIN" %}
+            <a href="/admin/users" class="topbar__link">Usuários</a>
+            <a href="/admin/backup" class="topbar__link">Backup</a>
+        {% endif %}
+        <a href="/auth/logout" class="topbar__link topbar__link--danger">Sair</a>
+    {% else %}
+        <a href="/auth/login" class="topbar__link">Entrar</a>
+    {% endif %}
+</nav>
+
+</header>
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', path='/js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

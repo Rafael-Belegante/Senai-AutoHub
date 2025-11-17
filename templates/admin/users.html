@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Usuários - Senai AutoHub{% endblock %}
+
+{% block content %}
+<section class="admin-list">
+    <div class="dashboard-header">
+        <h1>Usuários</h1>
+        <a href="/admin/users/new" class="btn btn--primary">Novo usuário</a>
+    </div>
+
+    <div class="table-wrapper">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Papel</th>
+                <th>Ativo</th>
+                <th>Criado em</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+                <tr>
+                    <td>{{ u.name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.role.value }}</td>
+                    <td>{{ "Sim" if u.is_active else "Não" }}</td>
+                    <td>{{ u.created_at.strftime("%d/%m/%Y") }}</td>
+                    <td>
+                        <a href="/admin/users/{{ u.id }}/edit" class="btn btn--secondary">Editar</a>
+                        <form method="post" action="/admin/users/{{ u.id }}/toggle-active" style="display:inline;">
+                            <button type="submit" class="btn btn--secondary">
+                                {% if u.is_active %}Desativar{% else %}Reativar{% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</section>
+{% endblock %}
